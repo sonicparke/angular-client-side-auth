@@ -1,8 +1,10 @@
 var express =       require('express')
-    , http =        require('http')
-    , passport =    require('passport')
-    , path =        require('path')
-    , User =        require('./server/models/User.js');
+var http =        require('http')
+// var mongoose    = require('mongoose');
+var passport =    require('passport')
+var path =        require('path')
+var User =        require('./server/models/User.js');
+var database = require('./server/config/database');
 
 var app = module.exports = express();
 
@@ -17,23 +19,21 @@ app.use(express.cookieSession(
     {
         secret: process.env.COOKIE_SECRET || "Superdupersecret"
     }));
+app.use(express.json());
 
-app.configure('development', 'production', function() {
-    app.use(express.csrf());
-    app.use(function(req, res, next) {
-        res.cookie('XSRF-TOKEN', req.csrfToken());
-        next();
-    });
-});
+//////// What does this do? ////////
+// app.configure('development', 'production', function() {
+//     app.use(express.csrf());
+//     app.use(function(req, res, next) {
+//         res.cookie('XSRF-TOKEN', req.csrfToken());
+//         next();
+//     });
+// });
 
 app.use(passport.initialize());
 app.use(passport.session());
 
 passport.use(User.localStrategy);
-passport.use(User.twitterStrategy());  // Comment out this line if you don't want to enable login via Twitter
-passport.use(User.facebookStrategy()); // Comment out this line if you don't want to enable login via Facebook
-passport.use(User.googleStrategy());   // Comment out this line if you don't want to enable login via Google
-passport.use(User.linkedInStrategy()); // Comment out this line if you don't want to enable login via LinkedIn
 
 passport.serializeUser(User.serializeUser);
 passport.deserializeUser(User.deserializeUser);
